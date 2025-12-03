@@ -1,16 +1,24 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const dht22Routes = require("./routes/dht22.js");
 const middlewareLogRequest = require("./middleware/logs.js");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Middleware
 app.use(cors());
-
 app.use(express.json());
 app.use(middlewareLogRequest);
+
+// ✅ Serve frontend dari folder public
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public", "index.html"));
+});
 
 // Routes
 app.use("/api/dht22", dht22Routes);
