@@ -32,7 +32,5 @@ app.get("/api", (req, res) => {
 
 // Listen pada semua network interfaces
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on:`);
-  console.log(`   http://localhost:${PORT}`);
-  console.log(`   http://192.168.213.143:${PORT}`);
+  console.log(`🚀 Server started on port ${PORT}`);
 });
