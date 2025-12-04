@@ -1,5 +1,5 @@
 // Konfigurasi API sesuai dengan backend
-const API_BASE = "https://skripsi-production-2cc1.up.railway.app/api";
+const API_BASE = "https://skripsimicrocontrollerlab.up.railway.app/api";
 
 // Debugging - Log ketika script dimuat
 console.log("✅ Script.js loaded successfully");
