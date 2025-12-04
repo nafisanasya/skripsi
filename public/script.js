@@ -169,7 +169,7 @@ async function fetchDataFromBackend() {
     const [frontResponse, sideResponse, backResponse] = await Promise.all([
       fetch(`${API_BASE}/dht22/front/latest`),
       fetch(`${API_BASE}/dht22/side/latest`),
-      fetch(`${API_BASE}/dht22/back/latest`),
+      // fetch(`${API_BASE}/dht22/back/latest`),
     ]);
 
     if (!frontResponse.ok) {
@@ -178,23 +178,23 @@ async function fetchDataFromBackend() {
     if (!sideResponse.ok) {
       throw new Error(`Side HTTP error! status: ${sideResponse.status}`);
     }
-    if (!backResponse.ok) {
-      throw new Error(`Back HTTP error! status: ${backResponse.status}`);
-    }
+    // if (!backResponse.ok) {
+    //   throw new Error(`Back HTTP error! status: ${backResponse.status}`);
+    // }
 
     const frontData = await frontResponse.json();
     const sideData = await sideResponse.json();
-    const backData = await backResponse.json();
+    // const backData = await backResponse.json();
 
     console.log("✅ Front data received:", frontData);
     console.log("✅ Side data received:", sideData);
-    console.log("✅ Back data received:", backData);
+    // console.log("✅ Back data received:", backData);
 
     // Update UI dengan data dari backend
     updateUIWithBackendData({
       frontData: frontData,
       sideData: sideData,
-      backData: backData,
+      // backData: backData,
     });
   } catch (error) {
     console.error("❌ Error fetching data from backend:", error);
@@ -249,23 +249,23 @@ function updateUIWithBackendData(data) {
   }
 
   // Back sensor
-  if (data.backData && data.backData.data) {
-    const sensorBack = document.getElementById("sensor-back");
-    if (sensorBack) {
-      const temperature = sensorBack.querySelector(".temperature");
-      const humidity = sensorBack.querySelector(".humidity");
+  // if (data.backData && data.backData.data) {
+  //   const sensorBack = document.getElementById("sensor-back");
+  //   if (sensorBack) {
+  //     const temperature = sensorBack.querySelector(".temperature");
+  //     const humidity = sensorBack.querySelector(".humidity");
 
-      if (temperature) {
-        temperature.textContent = data.backData.data.temperature + " °C";
-      }
-      if (humidity) {
-        humidity.textContent = "Humidity: " + data.backData.data.humidity + "%";
-      }
+  //     if (temperature) {
+  //       temperature.textContent = data.backData.data.temperature + " °C";
+  //     }
+  //     if (humidity) {
+  //       humidity.textContent = "Humidity: " + data.backData.data.humidity + "%";
+  //     }
 
-      sensorBack.classList.add("updated");
-      setTimeout(() => sensorBack.classList.remove("updated"), 500);
-    }
-  }
+  //     sensorBack.classList.add("updated");
+  //     setTimeout(() => sensorBack.classList.remove("updated"), 500);
+  //   }
+  // }
 
   updateRoomStatus();
   updateRefreshTime();
