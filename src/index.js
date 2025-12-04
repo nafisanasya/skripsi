@@ -13,6 +13,13 @@ app.use(cors());
 app.use(express.json());
 app.use(middlewareLogRequest);
 
+// ✅ Serve frontend dari folder public
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public", "index.html"));
+});
+
 // Routes
 app.use("/api/dht22", dht22Routes);
 
@@ -30,13 +37,6 @@ app.get("/api", (req, res) => {
     },
   });
 });
-
-// app.get("/", (req, res) => {
-//   res.json({
-//     status: "online",
-//     message: "Railway deploy success ✅ Backend berjalan!",
-//   });
-// });
 
 // Listen pada semua network interfaces
 app.listen(PORT, "0.0.0.0", () => {
