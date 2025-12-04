@@ -15,4 +15,7 @@ router.get("/:location/latest", dht22Controller.getLatestDht);
 // POST data baru
 router.post("/", dht22Controller.createDht);
 
+// POST broadcast data sensor secara manual
+router.post("/:location/broadcast", dht22Controller.broadcastSensorData);
+
 module.exports = router;
