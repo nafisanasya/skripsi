@@ -13,13 +13,6 @@ app.use(cors());
 app.use(express.json());
 app.use(middlewareLogRequest);
 
-// ✅ Serve frontend dari folder public
-app.use(express.static(path.join(__dirname, "../public")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public", "index.html"));
-});
-
 // Routes
 app.use("/api/dht22", dht22Routes);
 
