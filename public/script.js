@@ -1,141 +1,8 @@
 // Konfigurasi API sesuai dengan backend
 const API_BASE = "https://skripsimicrocontrollerlab.up.railway.app/api";
-const WS_URL =
-  window.location.protocol === "https:"
-    ? `wss://${window.location.host}`
-    : `ws://${window.location.host}`;
 
 // Debugging - Log ketika script dimuat
 console.log("✅ Script.js loaded successfully");
-
-// ============ WEBSOCKET MANAGER ============
-class WebSocketManager {
-  constructor() {
-    this.socket = null;
-    this.isConnected = false;
-    this.reconnectInterval = 5000; // 5 detik
-    this.reconnectTimer = null;
-  }
-
-  connect() {
-    console.log("🔌 Connecting to WebSocket...");
-
-    try {
-      this.socket = new WebSocket(WS_URL);
-
-      this.socket.onopen = () => {
-        console.log("✅ WebSocket connected");
-        this.isConnected = true;
-        this.clearReconnect();
-
-        // Kirim pesan subscribe
-        this.send({
-          type: "subscribe",
-          channels: ["sensors"],
-        });
-      };
-
-      this.socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          this.handleMessage(data);
-        } catch (error) {
-          console.error("❌ Error parsing WebSocket message:", error);
-        }
-      };
-
-      this.socket.onclose = () => {
-        console.log("🔌 WebSocket disconnected");
-        this.isConnected = false;
-        this.scheduleReconnect();
-      };
-
-      this.socket.onerror = (error) => {
-        console.error("❌ WebSocket error:", error);
-        this.isConnected = false;
-      };
-    } catch (error) {
-      console.error("❌ Failed to create WebSocket:", error);
-    }
-  }
-
-  send(data) {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(data));
-    }
-  }
-
-  handleMessage(data) {
-    console.log("📨 WebSocket message received:", data);
-
-    if (data.type === "sensor_update") {
-      this.updateSensorFromWebSocket(data.data);
-    }
-  }
-
-  updateSensorFromWebSocket(sensorData) {
-    console.log("🔄 Updating sensor from WebSocket:", sensorData);
-
-    // Update UI berdasarkan lokasi sensor
-    const sensorId = `sensor-${sensorData.location}`;
-    const sensorElement = document.getElementById(sensorId);
-
-    if (sensorElement) {
-      const temperature = sensorElement.querySelector(".temperature");
-      const humidity = sensorElement.querySelector(".humidity");
-
-      if (temperature) {
-        temperature.textContent = `${sensorData.temperature} °C`;
-        // Add animation
-        temperature.classList.add("updated");
-        setTimeout(() => temperature.classList.remove("updated"), 500);
-      }
-
-      if (humidity) {
-        humidity.textContent = `Humidity: ${sensorData.humidity}%`;
-        // Add animation
-        humidity.classList.add("updated");
-        setTimeout(() => humidity.classList.remove("updated"), 500);
-      }
-
-      console.log(`✅ Updated ${sensorData.location} sensor from WebSocket`);
-
-      // Update waktu refresh
-      updateRefreshTime();
-    } else {
-      console.warn(`⚠️ Sensor element not found: ${sensorId}`);
-    }
-  }
-
-  scheduleReconnect() {
-    if (!this.reconnectTimer) {
-      console.log(
-        `🔄 Reconnecting in ${this.reconnectInterval / 1000} seconds...`
-      );
-      this.reconnectTimer = setTimeout(() => {
-        this.reconnectTimer = null;
-        this.connect();
-      }, this.reconnectInterval);
-    }
-  }
-
-  clearReconnect() {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-  }
-
-  disconnect() {
-    if (this.socket) {
-      this.socket.close();
-    }
-    this.clearReconnect();
-  }
-}
-
-// Global WebSocket manager instance
-let wsManager = null;
 
 // Update waktu terakhir refresh
 function updateRefreshTime() {
@@ -298,7 +165,7 @@ async function fetchDataFromBackend() {
   try {
     console.log("🔄 Starting to fetch data from backend...");
 
-    // Coba ambil data dari backend, jika gagal gunakan WebSocket sebagai fallback
+    // Ambil data dari MySQL untuk front, side, dan back secara parallel
     const [frontResponse, sideResponse, backResponse] = await Promise.all([
       fetch(`${API_BASE}/dht22/front/latest`),
       fetch(`${API_BASE}/dht22/side/latest`),
@@ -331,12 +198,8 @@ async function fetchDataFromBackend() {
     });
   } catch (error) {
     console.error("❌ Error fetching data from backend:", error);
-
-    // Jika WebSocket terhubung, kita bisa skip setDefaultData
-    // karena data akan datang melalui WebSocket
-    if (!wsManager || !wsManager.isConnected) {
-      setDefaultData();
-    }
+    // Tetap tampilkan - jika gagal mengambil data
+    setDefaultData();
   }
 }
 
@@ -796,10 +659,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize event listeners
   initializeEventListeners();
 
-  // Initialize WebSocket connection
-  wsManager = new WebSocketManager();
-  wsManager.connect();
-
   // Set semua data ke default (-)
   setDefaultData();
 
@@ -809,11 +668,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Update refresh time every 10 seconds
   setInterval(updateRefreshTime, 10000);
 
-  // Fetch data dari backend setiap 30 detik (kurangi frekuensi karena ada WebSocket)
-  setInterval(fetchDataFromBackend, 30000);
+  // Fetch data dari backend setiap 10 detik
+  setInterval(fetchDataFromBackend, 10000);
 
   console.log("✅ Application initialization complete!");
 });
-
-// Expose WebSocket manager untuk debugging
-window.wsManager = wsManager;
