@@ -31,12 +31,12 @@ app.get("/api", (req, res) => {
   });
 });
 
-app.get("/", (req, res) => {
-  res.json({
-    status: "online",
-    message: "Railway deploy success ✅ Backend berjalan!",
-  });
-});
+// app.get("/", (req, res) => {
+//   res.json({
+//     status: "online",
+//     message: "Railway deploy success ✅ Backend berjalan!",
+//   });
+// });
 
 // Listen pada semua network interfaces
 app.listen(PORT, "0.0.0.0", () => {
