@@ -854,10 +854,10 @@ input:checked + .slider:before {
 
 /* Force fit to one page adjustments */
 body {
-  min-height: 100vh;
-  height: auto;
-  overflow-y: auto; /* izinkan scroll vertikal */
-  overflow-x: hidden;
+  transform: scale(0.995);
+  transform-origin: top;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Reduce padding & spacing for compact view */
